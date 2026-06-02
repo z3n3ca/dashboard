@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CA/Browser Forum Compliance Deadlines</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap');
+
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #1c2230;
+    --border: #2a3444;
+    --text: #e6edf3;
+    --muted: #7d8fa8;
+    --accent: #58a6ff;
+    --past: #3fb950;
+    --upcoming: #d29922;
+    --future: #58a6ff;
+    --urgent: #f85149;
+    --tag-bg: rgba(88, 166, 255, 0.1);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    padding: 32px 24px;
+    min-height: 100vh;
+  }
+
+  header {
+    margin-bottom: 28px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 20px;
+  }
+
+  header h1 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+
+  header p {
+    color: var(--muted);
+    font-size: 12px;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  .legend {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 11px;
+    color: var(--muted);
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .dot.past { background: var(--past); }
+  .dot.upcoming { background: var(--upcoming); }
+  .dot.future { background: var(--future); }
+
+  .filters {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+
+  .filter-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    padding: 5px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .filter-btn:hover, .filter-btn.active {
+    background: var(--tag-bg);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .table-wrap {
+    overflow-x: auto;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 900px;
+  }
+
+  thead {
+    background: var(--surface2);
+    position: sticky;
+    top: 0;
+    z-index: 2;
+  }
+
+  th {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+
+  th:first-child { width: 120px; }
+
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.12s ease;
+  }
+
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: rgba(255,255,255,0.025); }
+  tbody tr.hidden { display: none; }
+
+  td {
+    padding: 12px 16px;
+    vertical-align: top;
+  }
+
+  .date-cell {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 3px;
+    margin-top: 4px;
+    white-space: nowrap;
+  }
+
+  .badge-past {
+    background: rgba(63, 185, 80, 0.12);
+    color: var(--past);
+    border: 1px solid rgba(63, 185, 80, 0.25);
+  }
+
+  .badge-upcoming {
+    background: rgba(210, 153, 34, 0.12);
+    color: var(--upcoming);
+    border: 1px solid rgba(210, 153, 34, 0.25);
+  }
+
+  .badge-future {
+    background: rgba(88, 166, 255, 0.1);
+    color: var(--accent);
+    border: 1px solid rgba(88, 166, 255, 0.2);
+  }
+
+  .change-name {
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 3px;
+    line-height: 1.4;
+  }
+
+  .change-desc {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  .ballot-tag {
+    display: inline-block;
+    background: var(--tag-bg);
+    color: var(--accent);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 3px;
+    border: 1px solid rgba(88, 166, 255, 0.2);
+    white-space: nowrap;
+  }
+
+  .category-tag {
+    display: inline-block;
+    font-size: 10px;
+    font-family: 'IBM Plex Mono', monospace;
+    padding: 2px 7px;
+    border-radius: 3px;
+    white-space: nowrap;
+  }
+
+  .cat-validity { background: rgba(210, 153, 34, 0.12); color: #d29922; border: 1px solid rgba(210, 153, 34, 0.2); }
+  .cat-dcv { background: rgba(248, 81, 73, 0.1); color: #f85149; border: 1px solid rgba(248, 81, 73, 0.2); }
+  .cat-dnssec { background: rgba(63, 185, 80, 0.1); color: #3fb950; border: 1px solid rgba(63, 185, 80, 0.2); }
+  .cat-mpic { background: rgba(188, 140, 255, 0.1); color: #bc8cff; border: 1px solid rgba(188, 140, 255, 0.2); }
+  .cat-crypto { background: rgba(255, 123, 0, 0.1); color: #ff8c42; border: 1px solid rgba(255, 123, 0, 0.2); }
+  .cat-infra { background: rgba(88, 166, 255, 0.1); color: #58a6ff; border: 1px solid rgba(88, 166, 255, 0.2); }
+
+  a.ballot-link {
+    color: var(--accent);
+    text-decoration: none;
+    font-size: 11px;
+    font-family: 'IBM Plex Mono', monospace;
+    opacity: 0.8;
+    transition: opacity 0.1s;
+  }
+  a.ballot-link:hover { opacity: 1; text-decoration: underline; }
+
+  .group-header td {
+    background: var(--surface2);
+    color: var(--muted);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 8px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  tfoot td {
+    padding: 12px 16px;
+    font-size: 11px;
+    color: var(--muted);
+    font-family: 'IBM Plex Mono', monospace;
+    border-top: 1px solid var(--border);
+    background: var(--surface2);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>CA/Browser Forum — Compliance Deadline Reference</h1>
+  <p>Effective dates for publicly-trusted CAs · as of June 2026 · Server Certificate WG (TLS BRs)</p>
+</header>
+
+<div class="legend">
+  <div class="legend-item"><div class="dot past"></div>In Effect (≤ today)</div>
+  <div class="legend-item"><div class="dot upcoming"></div>2026 Upcoming</div>
+  <div class="legend-item"><div class="dot future"></div>Future (2027–2029)</div>
+</div>
+
+<div class="filters">
+  <button class="filter-btn active" onclick="filterRows('all', this)">All</button>
+  <button class="filter-btn" onclick="filterRows('validity', this)">Validity</button>
+  <button class="filter-btn" onclick="filterRows('dcv', this)">DCV / Data Reuse</button>
+  <button class="filter-btn" onclick="filterRows('dnssec', this)">DNSSEC</button>
+  <button class="filter-btn" onclick="filterRows('mpic', this)">MPIC</button>
+  <button class="filter-btn" onclick="filterRows('crypto', this)">Crypto / SHA-1</button>
+  <button class="filter-btn" onclick="filterRows('infra', this)">Infrastructure</button>
+</div>
+
+<div class="table-wrap">
+<table id="main-table">
+  <thead>
+    <tr>
+      <th>Effective Date</th>
+      <th>Change</th>
+      <th>Category</th>
+      <th>Ballot</th>
+      <th>Reference</th>
+    </tr>
+  </thead>
+  <tbody>
+
+    <!-- ── MARCH 2026 ── -->
+    <tr class="group-header"><td colspan="5">March 15, 2026 — In Effect</td></tr>
+
+    <tr data-cat="validity" class="">
+      <td class="date-cell">
+        2026-03-15
+        <div><span class="status-badge badge-past">● In Effect</span></div>
+      </td>
+      <td>
+        <div class="change-name">Maximum TLS Certificate Validity: 200 Days</div>
+        <div class="change-desc">First phase of the phased reduction 
+from 398 days to 47 days. CAs must not issue subscriber certificates 
+with validity exceeding 200 days.</div>
+      </td>
+      <td><span class="category-tag cat-validity">Validity</span></td>
+      <td><span class="ballot-tag">SC-081v3</span></td>
+      <td><a class="ballot-link" href="https://cabforum.org/2025/04/11/ballot-sc081v3-introduce-schedule-of-reducing-validity-and-data-reuse-periods/" target="_blank">↗ Ballot</a></td>
+    </tr>
+
+    <tr data-cat="dcv" class="">
+      <td class="date-cell">
+        2026-03-15
+        <div><span class="status-badge badge-past">● In Effect</span></div>
+      </td>
+      <td>
+        <div class="change-name">DCV Reuse Period Reduced to 200 Days</div>
+        <div class="change-desc">Maximum period for reusing domain control validation data drops from 398 days to 200 days.</div>
+      </td>
+      <td><span class="category-tag cat-dcv">DCV / Data Reuse</span></td>
+      <td><span class="ballot-tag">SC-081v3</span></td>
+      <td><a class="ballot-link" href="https://cabforum.org/2025/04/11/ballot-sc081v3-introduce-schedule-of-reducing-validity-and-data-reuse-periods/" target="_blank">↗ Ballot</a></td>
+    </tr>
+
+    <tr data-cat="dcv" class="">
+      <td class="date-cell">
+        2026-03-15
+        <div><span class="status-badge badge-past">● In Effect</span></div>
+      </td>
+      <td>
+        <div class="change-name">Subject Identity Information (SII) Reuse: 398 Days</div>
+        <div class="change-desc">Organizational identity data reuse for 
+OV/EV certificates drops from 825 days to 398 days. Requires more 
+frequent re-verification of business credentials.</div>
+      </td>
+      <td><span class="category-tag cat-dcv">DCV / Data Reuse</span></td>
+      <td><span class="ballot-tag">SC-081v3</span></td>
+      <td><a class="ballot-link" href="https://cabforum.org/2025/04/11/ballot-sc081v3-introduce-schedule-of-reducing-validity-and-data-reuse-periods/" target="_blank">↗ Ballot</a></td>
+    </tr>
+
+    <tr data-cat="validity" class="">
+      <td class="date-cell">
+        2026-03-15
+        <div><span class="status-badge badge-past">● In Effect</span></div>
+      </td>
+      <td>
+        <div class="change-name">Short-Lived Certificate Threshold: 7 Days</div>
+        <div class="change-desc">Definition of "Short-Lived Subscriber Certificate" tightens from ≤10 days to ≤7 days validity.</div>
+      </td>
+      <td><span class="category-tag cat-validity">Validity</span></td>
+      <td><span class="ballot-tag">SC-081v3</span></td>
+      <td><a class="ballot-link" href="https://cabforum.org/working-groups/server/baseline-requirements/requirements/" target="_blank">↗ TLS BRs</a></td>
+    </tr>
+
+    <tr data-cat="dnssec" class="">
+      <td class="date-cell">
+        2026-03-15
+        <div><span class="status-badge badge-past">● In Effect</span></div>
+      </td>
+      <td>
+        <div class="change-name">DNSSEC Validation Required for CAA &amp; DCV Lookups</div>
+        <div class="change-desc">CAs must validate DNSSEC (when present)
+ back to the IANA root trust anchor on all DNS queries for CAA record 
+lookups and domain control validation by the Primary Network 
+Perspective. Delegation of this check is prohibited.</div>
+      </td>
+      <td><span class="category-tag cat-dnssec">DNSSEC</span></td>
+      <td><span class="ballot-tag">SC-085v2</span></td>
+      <td><a class="ballot-link" href="https://cabforum.org/2025/06/18/ballot-sc-085v2-require-validation-of-dnssec-when-present-for-caa-and-dcv-lookups/" target="_blank">↗ Ballot</a></td>
+    </tr>
+
+    <tr data-cat="crypto" class="">
+      <td class="date-cell">
+        2026-03-15
+        <div><span class="status-badge badge-past">● In Effect</span></div>
+      </td>
+      <td>
+        <div class="change-name">SHA-1 Signatures Prohibited in Certificates &amp; CRLs</div>
+        <div class="change-desc">All remaining use of SHA-1 in 
+certificate and CRL signatures is prohibited. Unexpired Subordinate CA 
+certificates with SHA-1 signatures must be revoked.</div>
+      </td>
+      <td><span class="category-tag cat-crypto">Crypto / SHA-1</span></td>
+      <td><span class="ballot-tag">SC-097</span></td>
+      <td><a class="ballot-link" href="https://cabforum.org/2026/01/24/ballot-sc097-sunset-all-remaining-use-of-sha-1-signatures-in-certificates-and-crls/" target="_blank">↗ Ballot</a></td>
+    </tr>
+
+    <tr data-cat="infra" class="">
+      <td class="date-cell">
+        2026-03-15
+        <div><span class="status-badge badge-past">● In Effect</span></div>
+      </td>
+      <td>
+        <div class="change-name">Precertificate Signing CAs Prohibited</div>
+        <div class="change-desc">CAs must not issue new certificates 
+using the Precertificate Signing CA profile (Section 7.1.2.4), and 
+existing Precertificate Signing CAs must not be used to issue new 
+precertificates.</div>
+      </td>
+      <td><span class="category-tag cat-infra">Infrastructure</span></td>
+      <td><span class="ballot-tag">SC-092</span></td>
+      <td><a class="ballot-link" href="https://cabforum.org/2025/09/02/ballot-sc-092-sunset-use-of-precertificate-signing-cas/" target="_blank">↗ Ballot</a></td>
+    </tr>
+
+    <tr data-cat="dcv" class="">
+      <td class="date-cell">
+        2026-03-15
+        <div><span class="status-badge badge-past">● In Effect</span></div>
+      </td>
+      <td>
+        <div class="change-name">Email/Crossover DCV Methods: SHOULD NOT Use</div>
+        <div class="change-desc">Email-based DCV methods (3.2.2.4.4, 
+.13, .14) transition to SHOULD NOT. Method 3.2.2.4.8 (IP Address 
+"crossover" method) is hard prohibited as of this date.</div>
+      </td>
+      <td><span class="category-tag cat-dcv">DCV / Data Reuse</span></td>
+      <td><span class="ballot-tag">SC-090</span></td>
+      <td><a class="ballot-link" href="https://cabforum.org/2025/11/20/ballot-sc-090-gradually-sunset-all-remaining-email-based-phone-based-and-crossover-validation-methods-from-sections-3.2.2.4-and-3.2.2.5/" target="_blank">↗ Ballot</a></td>
+    </tr>
+
+    <!-- ── JUNE 2026 ── -->
+    <tr class="group-header"><td colspan="5">June 15, 2026 — Upcoming</td></tr>
+
+    <tr data-cat="mpic">
+      <td class="date-cell">
+        2026-06-15
+        <div><span class="status-badge badge-upcoming">◐ Upcoming</span></div>
+      </td>
+      <td>
+        <div class="change-name">MPIC: Increase to 4 Remote Network Perspectives</div>
+        <div class="change-desc">Phased rollout of Multi-Perspective 
+Issuance Corroboration raises the minimum number of remote network 
+perspectives used for domain validation and CAA checks to 4.</div>
+      </td>
+      <td><span class="category-tag cat-mpic">MPIC</span></td>
+      <td><span class="ballot-tag">SC-067v3</span></td>
+      <td><a class="ballot-link" href="https://cabforum.org/2024/08/05/ballot-sc067v3-require-domain-validation-and-caa-checks-to-be-performed-from-multiple-network-perspectives-corroboration/" target="_blank">↗ Ballot</a></td>
+    </tr>
+
+    <!-- ── DECEMBER 2026 ── -->
+    <tr class="group-header"><td colspan="5">December 15, 2026 — Upcoming</td></tr>
+
+    <tr data-cat="mpic">
+      <td class="date-cell">
+        2026-12-15
+        <div><span class="status-badge badge-upcoming">◐ Upcoming</span></div>
+      </td>
+      <td>
+        <div class="change-name">MPIC: Increase to 5 Remote Network Perspectives</div>
+        <div class="change-desc">Final phase of the MPIC phased rollout.
+ Quorum requirements increase to require 5 or more geographically 
+diverse remote perspectives for all domain validation and CAA checks.</div>
+      </td>
+      <td><span class="category-tag cat-mpic">MPIC</span></td>
+      <td><span class="ballot-tag">SC-067v3</span></td>
+      <td><a class="ballot-link" href="https://cabforum.org/2024/08/05/ballot-sc067v3-require-domain-validation-and-caa-checks-to-be-performed-from-multiple-network-perspectives-corroboration/" target="_blank">↗ Ballot</a></td>
+    </tr>
+
+    <!-- ── MARCH 2027 ── -->
+    <tr class="group-header"><td colspan="5">March 15, 2027 — Future</td></tr>
+
+    <tr data-cat="validity" class="">
+      <td class="date-cell">
+        2027-03-15
+        <div><span class="status-badge badge-future">○ Future</span></div>
+      </td>
+      <td>
+        <div class="change-name">Maximum TLS Certificate Validity: 100 Days</div>
+        <div class="change-desc">Second phase of the phased validity 
+reduction. Manual certificate management becomes practically 
+unsustainable at this threshold.</div>
+      </td>
+      <td><span class="category-tag cat-validity">Validity</span></td>
+      <td><span class="ballot-tag">SC-081v3</span></td>
+      <td><a class="ballot-link" href="https://cabforum.org/2025/04/11/ballot-sc081v3-introduce-schedule-of-reducing-validity-and-data-reuse-periods/" target="_blank">↗ Ballot</a></td>
+    </tr>
+
+    <tr data-cat="dcv" class="">
+      <td class="date-cell">
+        2027-03-15
+        <div><span class="status-badge badge-future">○ Future</span></div>
+      </td>
+      <td>
+        <div class="change-name">DCV Reuse Period Reduced to 100 Days</div>
+        <div class="change-desc">Domain control validation reuse drops from 200 days to 100 days. Parallel to the validity reduction.</div>
+      </td>
+      <td><span class="category-tag cat-dcv">DCV / Data Reuse</span></td>
+      <td><span class="ballot-tag">SC-081v3</span></td>
+      <td><a class="ballot-link" href="https://cabforum.org/2025/04/11/ballot-sc081v3-introduce-schedule-of-reducing-validity-and-data-reuse-periods/" target="_blank">↗ Ballot</a></td>
+    </tr>
+
+    <tr data-cat="dcv" class="">
+      <td class="date-cell">
+        2027-03-15
+        <div><span class="status-badge badge-future">○ Future</span></div>
+      </td>
+      <td>
+        <div class="change-name">Email, Phone &amp; Fax DCV Methods: Hard Prohibited</div>
+        <div class="change-desc">All remaining email (3.2.2.4.4, .13, 
+.14), phone (3.2.2.4.16, .17, 3.2.2.5.5), fax/SMS (3.2.2.5.2) domain 
+validation methods are fully prohibited. Prior validations using these 
+methods may not be reused.</div>
+      </td>
+      <td><span class="category-tag cat-dcv">DCV / Data Reuse</span></td>
+      <td><span class="ballot-tag">SC-090</span></td>
+      <td><a class="ballot-link" href="https://cabforum.org/2025/11/20/ballot-sc-090-gradually-sunset-all-remaining-email-based-phone-based-and-crossover-validation-methods-from-sections-3.2.2.4-and-3.2.2.5/" target="_blank">↗ Ballot</a></td>
+    </tr>
+
+    <!-- ── MARCH 2029 ── -->
+    <tr class="group-header"><td colspan="5">March 15, 2029 — Future</td></tr>
+
+    <tr data-cat="validity" class="">
+      <td class="date-cell">
+        2029-03-15
+        <div><span class="status-badge badge-future">○ Future</span></div>
+      </td>
+      <td>
+        <div class="change-name">Maximum TLS Certificate Validity: 47 Days</div>
+        <div class="change-desc">Final phase. Certificates must not 
+exceed 47 days validity. Represents an ~8× increase in renewal frequency
+ vs. the 398-day era. Automation is mandatory at this stage.</div>
+      </td>
+      <td><span class="category-tag cat-validity">Validity</span></td>
+      <td><span class="ballot-tag">SC-081v3</span></td>
+      <td><a class="ballot-link" href="https://cabforum.org/2025/04/11/ballot-sc081v3-introduce-schedule-of-reducing-validity-and-data-reuse-periods/" target="_blank">↗ Ballot</a></td>
+    </tr>
+
+    <tr data-cat="dcv" class="">
+      <td class="date-cell">
+        2029-03-15
+        <div><span class="status-badge badge-future">○ Future</span></div>
+      </td>
+      <td>
+        <div class="change-name">DCV Reuse Period Reduced to 10 Days</div>
+        <div class="change-desc">Domain control validation data may only
+ be reused for 10 days, making near-continuous automated domain 
+validation effectively mandatory.</div>
+      </td>
+      <td><span class="category-tag cat-dcv">DCV / Data Reuse</span></td>
+      <td><span class="ballot-tag">SC-081v3</span></td>
+      <td><a class="ballot-link" href="https://cabforum.org/2025/04/11/ballot-sc081v3-introduce-schedule-of-reducing-validity-and-data-reuse-periods/" target="_blank">↗ Ballot</a></td>
+    </tr>
+
+  </tbody>
+  <tfoot>
+    <tr>
+      <td colspan="5">
+        Sources: cabforum.org · github.com/cabforum/servercert · All dates per TLS BR v2.x as of June 2026
+      </td>
+    </tr>
+  </tfoot>
+</table>
+</div>
+
+<script>
+  function filterRows(cat, btn) {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    const rows = document.querySelectorAll('tbody tr[data-cat]');
+    const headers = document.querySelectorAll('tbody tr.group-header');
+
+    rows.forEach(row => {
+      if (cat === 'all' || row.dataset.cat === cat) {
+        row.classList.remove('hidden');
+      } else {
+        row.classList.add('hidden');
+      }
+    });
+
+    // Hide group headers if all their data rows are hidden
+    headers.forEach(header => {
+      let next = header.nextElementSibling;
+      let hasVisible = false;
+      while (next && !next.classList.contains('group-header')) {
+        if (!next.classList.contains('hidden')) hasVisible = true;
+        next = next.nextElementSibling;
+      }
+      header.classList.toggle('hidden', !hasVisible);
+    });
+  }
+</script>
+
+
+</body></html>
